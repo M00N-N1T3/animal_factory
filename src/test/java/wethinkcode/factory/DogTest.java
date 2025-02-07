@@ -1,7 +1,9 @@
 package wethinkcode.factory;
 
-import wethinkcode.factory.Dog;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wethinkcode.util.StdoutReader;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -10,6 +12,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DogTest {
+
+    private StdoutReader stdoutReader;
+
+    @BeforeEach
+    void SetUp(){
+        this.stdoutReader = new StdoutReader();
+    }
+
+    @AfterEach
+    public void TearDown(){
+        stdoutReader.closeOutputStream();
+    }
 
     @Test
     public void dogClassImplementsInterface(){
@@ -22,15 +36,18 @@ public class DogTest {
     public void dogClassContainsCorrectMethods(){
         Class<Dog> dog = Dog.class;
         List<String> methodsFoundInClass = Arrays.stream(dog.getDeclaredMethods()).map(Method::getName).toList();
-        List<String> expectedMethods = List.of("speak","getType","equals");
+        List<String> expectedMethods = List.of("speak","getType");
         assertTrue(methodsFoundInClass.containsAll(expectedMethods));
     }
 
     @Test
     public void correctAnimalSound(){
         Dog dog = new Dog();
+        stdoutReader.captureOutput();
+        dog.speak();
+        String actual = stdoutReader.getOutputAsText().trim();
         String expected = "Woof! Woof!";
-        assertEquals(expected, dog.speak());
+        assertEquals(expected, actual);
     }
 
     @Test

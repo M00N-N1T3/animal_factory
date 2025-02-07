@@ -1,7 +1,10 @@
 package wethinkcode.factory;
 
-import wethinkcode.factory.Cat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import wethinkcode.util.StdoutReader;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +12,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CatTest {
+    private StdoutReader stdoutReader;
+
+    @BeforeEach
+    void SetUp(){
+        this.stdoutReader = new StdoutReader();
+    }
+
+    @AfterEach
+    public void TearDown(){
+        stdoutReader.closeOutputStream();
+    }
 
     @Test
     public void catClassImplementsInterface(){
@@ -21,15 +35,18 @@ public class CatTest {
     public void catClassContainsCorrectMethods(){
         Class<Cat> cat = Cat.class;
         List<String> methodsFoundInClass = Arrays.stream(cat.getDeclaredMethods()).map(Method::getName).toList();
-        List<String> expectedMethods = List.of("speak","getType","equals");
+        List<String> expectedMethods = List.of("speak","getType");
         assertTrue(methodsFoundInClass.containsAll(expectedMethods));
     }
 
     @Test
     public void correctAnimalSound(){
         Cat cat = new Cat();
+        stdoutReader.captureOutput();
+        cat.speak();
         String expected = "Meow!";
-        assertEquals(expected, cat.speak());
+        String actual = stdoutReader.getOutputAsText().trim();
+        assertEquals(expected,actual);
     }
 
     @Test
